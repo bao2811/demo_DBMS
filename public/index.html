@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClassicModels Analytics</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+
+    <header class="top-header">
+      <div>
+        <h1>ClassicModels Analytics</h1>
+        <p>Thong ke, bao cao, tim kiem voi RESTful API + ORM</p>
+      </div>
+      <nav class="menu" aria-label="Dieu huong chinh">
+        <button class="menu-btn active" data-view="dashboard">Dashboard</button>
+        <button class="menu-btn" data-view="reports">Bao cao</button>
+        <button class="menu-btn" data-view="search">Tim kiem</button>
+        <button class="menu-btn" data-view="assistant">Chatbot</button>
+      </nav>
+    </header>
+
+    <main class="main-shell">
+      <section class="card filters global-filters">
+        <div>
+          <label for="fromDate">Tu ngay</label>
+          <input id="fromDate" type="date" />
+        </div>
+        <div>
+          <label for="toDate">Den ngay</label>
+          <input id="toDate" type="date" />
+        </div>
+        <div>
+          <label for="groupBy">Nhom thoi gian</label>
+          <select id="groupBy">
+            <option value="month">Theo thang</option>
+            <option value="day">Theo ngay</option>
+          </select>
+        </div>
+        <div class="filter-actions">
+          <button id="applyFilters">Ap dung</button>
+          <button id="resetFilters" class="secondary">Mac dinh</button>
+        </div>
+      </section>
+
+      <section id="view-dashboard" class="view-section active">
+        <section class="kpis">
+          <article class="card kpi">
+            <h3>Doanh thu</h3>
+            <strong id="kpiRevenue">0</strong>
+          </article>
+          <article class="card kpi">
+            <h3>So don hang</h3>
+            <strong id="kpiOrders">0</strong>
+          </article>
+          <article class="card kpi">
+            <h3>Khach hang</h3>
+            <strong id="kpiCustomers">0</strong>
+          </article>
+          <article class="card kpi">
+            <h3>Tong so luong</h3>
+            <strong id="kpiItems">0</strong>
+          </article>
+        </section>
+
+        <section class="card">
+          <h2>Doanh thu theo thoi gian</h2>
+          <canvas id="salesChart"></canvas>
+        </section>
+      </section>
+
+      <section id="view-reports" class="view-section">
+        <section class="grid-2">
+          <section class="card">
+            <div class="section-head">
+              <h2>Top khach hang</h2>
+              <input id="customerKeyword" placeholder="Tim khach hang..." />
+            </div>
+            <div class="table-wrap">
+              <table id="customerTable">
+                <thead>
+                  <tr>
+                    <th>Khach hang</th>
+                    <th>Quoc gia</th>
+                    <th>Don hang</th>
+                    <th>Doanh thu</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="section-head">
+              <h2>Top mat hang</h2>
+              <input id="productKeyword" placeholder="Tim mat hang..." />
+            </div>
+            <div class="table-wrap">
+              <table id="productTable">
+                <thead>
+                  <tr>
+                    <th>Ma hang</th>
+                    <th>Ten mat hang</th>
+                    <th>Nhom</th>
+                    <th>SL</th>
+                    <th>Doanh thu</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <section class="card">
+          <div class="section-head wrap">
+            <h2>Pivot report</h2>
+            <div class="pivot-controls">
+              <select id="pivotRows">
+                <option value="customer">Dong: Khach hang</option>
+                <option value="productLine">Dong: Nhom mat hang</option>
+                <option value="country">Dong: Quoc gia</option>
+                <option value="status">Dong: Trang thai don</option>
+                <option value="month">Dong: Thang</option>
+              </select>
+              <select id="pivotCols">
+                <option value="productLine">Cot: Nhom mat hang</option>
+                <option value="customer">Cot: Khach hang</option>
+                <option value="country">Cot: Quoc gia</option>
+                <option value="status">Cot: Trang thai don</option>
+                <option value="month">Cot: Thang</option>
+              </select>
+              <select id="pivotMetric">
+                <option value="revenue">Metric: Doanh thu</option>
+                <option value="qty">Metric: So luong</option>
+              </select>
+              <button id="loadPivot">Tai pivot</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table id="pivotTable">
+              <thead></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section id="view-search" class="view-section">
+        <section class="card">
+          <div class="section-head wrap">
+            <h2>Tim kiem don hang chi tiet</h2>
+            <div class="search-controls">
+              <input id="searchCustomer" placeholder="Khach hang" />
+              <input id="searchProduct" placeholder="Mat hang / ma hang" />
+              <button id="searchBtn">Tim kiem</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table id="searchTable">
+              <thead>
+                <tr>
+                  <th>Ngay</th>
+                  <th>So don</th>
+                  <th>Trang thai</th>
+                  <th>Khach hang</th>
+                  <th>Ma hang</th>
+                  <th>Ten mat hang</th>
+                  <th>Nhom</th>
+                  <th>SL</th>
+                  <th>Gia</th>
+                  <th>Doanh thu dong</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section id="view-assistant" class="view-section">
+        <section id="chatbot" class="chatbot card" aria-live="polite">
+          <div class="chatbot-head">
+            <h3>Tro ly bao cao</h3>
+            <p>Hoi nhanh ve tong quan, top khach hang, top mat hang</p>
+          </div>
+          <div id="chatMessages" class="chat-messages"></div>
+          <div class="chat-input-wrap">
+            <input
+              id="chatInput"
+              type="text"
+              placeholder="Vi du: Top khach hang thang nay"
+            />
+            <button id="chatSend">Gui</button>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
