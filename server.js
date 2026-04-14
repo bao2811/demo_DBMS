@@ -12,6 +12,11 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/api/v1", apiV1Routes);
 
+const uiRoutes = ["/", "/dashboard", "/reports", "/search", "/assistant"];
+app.get(uiRoutes, (_req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
 app.get("/health", (_, res) => {
   res.json({ ok: true, service: "classicmodels-analytics" });
 });

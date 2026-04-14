@@ -9,8 +9,9 @@ const fmtNumber = new Intl.NumberFormat("vi-VN");
 let salesChart;
 
 const elements = {
-  menuButtons: document.querySelectorAll(".menu-btn"),
+  menuButtons: document.querySelectorAll(".menu-link"),
   viewSections: document.querySelectorAll(".view-section"),
+  viewTitle: document.getElementById("viewTitle"),
   fromDate: document.getElementById("fromDate"),
   toDate: document.getElementById("toDate"),
   groupBy: document.getElementById("groupBy"),
@@ -39,7 +40,37 @@ const elements = {
   chatSend: document.getElementById("chatSend"),
 };
 
-function switchView(view) {
+const ROUTE_MAP = {
+  dashboard: "/dashboard",
+  reports: "/reports",
+  search: "/search",
+  assistant: "/assistant",
+};
+
+const TITLE_MAP = {
+  dashboard: "Dashboard",
+  reports: "Bao cao",
+  search: "Tim kiem",
+  assistant: "Chatbot",
+};
+
+function viewFromPath(pathname) {
+  if (pathname === "/reports") {
+    return "reports";
+  }
+
+  if (pathname === "/search") {
+    return "search";
+  }
+
+  if (pathname === "/assistant") {
+    return "assistant";
+  }
+
+  return "dashboard";
+}
+
+function switchView(view, push = true) {
   elements.menuButtons.forEach((button) => {
     button.classList.toggle("active", button.dataset.view === view);
   });
@@ -47,6 +78,18 @@ function switchView(view) {
   elements.viewSections.forEach((section) => {
     section.classList.toggle("active", section.id === `view-${view}`);
   });
+
+  elements.viewTitle.textContent = TITLE_MAP[view] || "Dashboard";
+
+  // Keep date/time filter panel visible at the top for every route.
+  window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+
+  if (push) {
+    const targetPath = ROUTE_MAP[view] || ROUTE_MAP.dashboard;
+    if (window.location.pathname !== targetPath) {
+      window.history.pushState({ view }, "", targetPath);
+    }
+  }
 }
 
 function escapeHtml(text) {
@@ -436,9 +479,16 @@ elements.chatInput.addEventListener("keydown", (event) => {
   }
 });
 elements.menuButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    switchView(button.dataset.view);
+  button.addEventListener("click", (event) => {
+    event.preventDefault();
+    switchView(button.dataset.view, true);
   });
 });
+
+window.addEventListener("popstate", () => {
+  switchView(viewFromPath(window.location.pathname), false);
+});
+
+switchView(viewFromPath(window.location.pathname), false);
 
 bootstrap();
